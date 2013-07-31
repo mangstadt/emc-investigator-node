@@ -143,14 +143,14 @@ function on_get_request(req, res){
 		} else {
 			//truncate time component from start date string if it's midnight
 			if (startTimeTs.hour() == 0 && startTimeTs.minute() == 0){
-				startTime = startTimeTs.format("YYYY-MM-DD");
+				startTime = req.query.startTime = startTimeTs.format("YYYY-MM-DD");
 			}
 			
 			//truncate time component from end date string if it's midnight
 			//also, include the entirety of the end date inside of the date range because this (most likely) means that the user didn't select a time
 			if (endTimeTs.hour() == 0 && endTimeTs.minute() == 0){
-				endTimeTs.add('days', 1); //moment(endTimeTs.valueOf() + 1000 * 60 * 60 * 24);
-				endTime = endTimeTs.format("YYYY-MM-DD");
+				endTime = req.query.endTime = endTimeTs.format("YYYY-MM-DD");
+				endTimeTs.add('days', 1);
 			}
 			
 			if (endTimeTs.isBefore(startTimeTs)){
