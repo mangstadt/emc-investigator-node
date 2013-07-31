@@ -189,7 +189,7 @@ function on_get_request(req, res){
 	var minimap = req.query.minimap !== undefined;
 	
 	if (errors.length > 0){
-		var data = build_data(server, world, req.query);
+		var data = build_data(server, world, req.query, errors);
 		send_response(res, data);
 		return;
 	}
