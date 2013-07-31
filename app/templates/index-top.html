@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>EMC Investigator</title>
+		
+		<link rel="icon" type="image/png" href="/images/favicon.png" />
+
+		<!-- jQuery -->
+		<script type="text/javascript" src="/js/jquery/jquery.min.js"></script>
+		<link rel="stylesheet" media="all" type="text/css" href="/js/jquery-ui/jquery-ui.min.css" />
+		<script type="text/javascript" src="/js/jquery-ui/jquery-ui.min.js"></script>
+
+		<!--
+		Timepicker widget
+		http://trentrichardson.com/examples/timepicker/
+		-->
+		<link rel="stylesheet" media="all" type="text/css" href="/js/jquery-ui/jquery-ui-timepicker-addon.css" />
+		<script type="text/javascript" src="/js/jquery-ui/jquery-ui-timepicker-addon.js"></script>
+		
+		<!-- http://www.kryogenix.org/code/browser/sorttable/ -->
+		<script type="text/javascript" src="/js/sorttable.js"></script>
+
+		<script>
+		$(document).ready(function() {
+			var options = {
+				dateFormat: 'yy-mm-dd',
+				hourGrid: 4,
+				minuteGrid: 10,
+				stepMinute: 10
+			};
+			
+			$('#startTime').datetimepicker(options);
+			$('#endTime').datetimepicker(options);
+			
+			//convert values that have a single space to empty strings
+			var textBoxes = ["startTime", "endTime", "x1", "z1", "x2", "z2", "players"];
+			textBoxes.forEach(function(id){
+				var textBox = $("#" + id);
+				if (textBox.val() == " "){
+					textBox.val("");
+				}
+			});
+		});
+
+		function validate(form){
+		//TODO use "moment"
+			var errors = [];
+			
+			var coordIds = ["x1", "z1", "x2", "z2"];
+			var coordsEntered = 0;
+			for (var i = 0; i < coordIds.length; i++){
+				var textBox = document.getElementById(coordIds[i]);
+				var value = textBox.value.trim();
+				if (value != ""){
+					coordsEntered++;
+				}
+			}
+			if (coordsEntered > 0){
+				if (coordsEntered < 4){
+					errors.push("Some coordinates are missing values.");
+				}
+				for (var i = 0; i < coordIds.length; i++){
+					var textBox = document.getElementById(coordIds[i]);
+					var value = textBox.value.trim();
+					if (value != "" && !isCoord(value)){
+						errors.push("Coordinates must be numeric and without decimals.");
+						break;
+					}
+				}
+			}
+			
+			var startTime = document.getElementById('startTime').value.trim();
+			var startTimeDate = parseTime(startTime);
+			if (startTime == ""){
+				errors.push("Start time required.");
+			} else {
+				if (startTimeDate == null){
+					errors.push("Invalid start time.");
+				}
+			}
+			
+			var endTime = document.getElementById('endTime').value.trim();
+			var endTimeDate = parseTime(endTime);
+			if (endTime == ""){
+				errors.push("End time required.");
+			} else {
+				if (endTimeDate == null){
+					errors.push("Invalid end time.");
+				}
+			}
+
+			if (startTimeDate != null && endTimeDate != null){
+				var startTs = startTimeDate.getTime();
+				var endTs = endTimeDate.getTime();
+
+				if (startTs > endTs){
+					errors.push("Start time must come before end time.");
+				} else {
+					if (endTimeDate.getHours() == 0 && endTimeDate.getMinutes() == 0){
+						endTs += 1000*60*60*24; //increment by 1 day
+					}
+					if (endTs - startTs > 1000*60*60*24*7){
+						errors.push("Time span cannot be longer than 1 week.");
+					}
+				}
+			}
+			
+			//add errors to <ul> list
+			var errorList = document.getElementById("errorList");
+			errorList.innerHTML = ""; //clear
+			for (var i = 0; i < errors.length; i++){
+				var error = errors[i];
+				var li = document.createElement("li");
+				li.appendChild(document.createTextNode(error));
+				errorList.appendChild(li);
+			}
+			
+			return errors.length == 0;
+		}
+		
+		var isCoord = function(){
+			var regex = /^-?\d+$/;
+			return function(value){
+				return regex.test(value);
+			};
+		}();
+		
+		var isTime = function(value){
+			return parseTime(value) != null;
+		};
+		
+		var parseTime = function(){
+			var regex = /^(\d{4})-(\d{1,2})-(\d{1,2})( +(\d{1,2}):(\d{2}))?$/;
+			return function(value){
+				var matches = value.match(regex);
+				
+				if (matches == null){
+					//string doesn't match
+					return null;
+				}
+				
+				if (matches[4] == null){
+					//only a date was entered
+					return new Date(matches[1], matches[2]-1, matches[3], 0, 0, 0, 0);
+				} else {
+					//date and time entered
+					return new Date(matches[1], matches[2]-1, matches[3], matches[5], matches[6], 0, 0);
+				}
+			};
+		}();
+		
+		
+		function checkCoord(textBox){
+			checkTextBox(textBox, isCoord);
+		}
+		
+		function checkTime(textBox){
+			checkTextBox(textBox, isTime);
+		}
+		
+		function checkTextBox(textBox, func){
+			var value = textBox.value.trim();
+			var className = "validText";
+			if (value != "" && !func(value)){
+				className = "invalidText"
+			}
+			textBox.className = className;
+		}
+		
+		function toggleVisibility(id){
+			var element = document.getElementById(id);
+			if (element == null){
+				return;
+			}
+			
+			var icon = document.getElementById(id + "-icon");
+			if (element.style.display == "none"){
+				element.style.display = "block";
+				if (icon != null){
+					icon.src = "/images/collapse.gif";
+				}
+			} else {
+				element.style.display = "none";
+				if (icon != null){
+					icon.src = "/images/expand.gif";
+				}
+			}
+		}
+		
+		function selectAll(textarea){
+			textarea.focus();
+			textarea.select();
+		}
+		
+		function showLoading(){
+			var submitButton = document.getElementById("submit");
+			submitButton.disabled = true;
+			
+			var loading = document.getElementById("loading");
+			loading.style.display = "block";
+		}
+		</script>
+		
+		<style>
+		body{
+			color:#fff;
+			background-color:#000;
+		}
+		
+		table{
+			color:#fff;
+		}
+		
+		img{
+			border:0px;
+		}
+		
+		tr.evenRow{
+			background-color:none;
+		}
+		
+		tr.oddRow{
+			background-color:#960;
+		}
+		
+		a:link, a:active, a:visited{
+			color: #f90;
+			text-decoration: underline;
+		}
+		a:hover{
+			color: #960;
+			text-decoration: none;
+		}
+		
+		.validText {
+			background-color: #fff;
+		}
+		.invalidText {
+			background-color: #f99;
+		}
+		
+		.note{
+			background-color: #666;
+			padding: 5px;
+			margin-top: 10px;
+		}
+		
+		.copyright{
+			font-size: 0.8em;
+			font-style: italic;
+			padding-top: 20px;
+		}
+		
+		.ui-datepicker{
+			font-size: 0.8em;
+		}
+		</style>
+	</head>
+	<body>
+		<div style="position:fixed; right:10px; top:10px;">
+			<a href="http://empire.us"><img src="/images/emc-logo.png" border="0" /></a><br />
+			<a href="https://sites.google.com/site/emclastlightoutpost/"><img src="/images/llo-logo.png" border="0" /></a><br /><br />
+			<div style="text-align:center; font-size:0.8em; padding:20px 0px 20px 0px; background-color:#333; cursor:pointer;" onclick="window.scrollTo(0,0)">
+				[<a href="#">scroll to top</a>]
+			</div>
+		</div>
+		
+		<div style="position:fixed; right:10px; bottom:10px;">
+			<a href="https://github.com/mangstadt/emc-investigator" target="_blank" style="font-size:0.8em">http://www.github.com/mangstadt/emc-investigator</a>
+		</div>
+		
+		<a href="." class="header"><img src="/images/logo.png" height="50%" width="50%" /></a><br />
+		<em>A griefer investigation tool for <a href="http://empire.us">Empire Minecraft</a></em><br />
+		<br />
+		
+		<table>
+			<tr>
+				<td align="right">Founder/Main Developer:</td>
+				<td><a href="http://empireminecraft.com/members/shavingfoam.12110/">shavingfoam</a></td>
+			</tr>
+			<tr>
+				<td align="right">Twig template programming:</td>
+				<td><a href="http://empireminecraft.com/members/alexschrod.28060/">alexschrod</a></td>
+			</tr>
+			<tr>
+				<td align="right">Logo:</td>
+				<td><a href="http://empireminecraft.com/members/nfell2009.6192/">nfell2009</a></td>
+			</tr>
+		</table>
+		
+		<div class="note"><strong>Note:</strong> If you have been griefed or have witnessed a griefing, <strong><em>contact a <a href="http://empireminecraft.com/XenStaff" target="_blank">moderator</a> immediately!</em></strong></div>
+		<div class="note"><strong>Note:</strong> This tool cannot detect hidden players.</div>
+		<hr />
+		
+		<form action="." method="get" onsubmit="var valid = validate(this); if (valid) showLoading(); return valid;">
+			<div style="color:red">
+				<ul id="errorList">
+					{{#errors}}
+						<li>{{.}}</li>
+					{{/errors}}
+				</ul>
+			</div>
+			
+			<em>{{> req.html}} = required</em>
+			
+			<div style="padding-top:10px">
+				<strong>Server:</strong>{{> req.html}}
+				<select name="server">
+					{{#servers}}
+						<option {{#selected}}selected{{/selected}}>{{name}}</option>
+					{{/servers}}
+				</select>
+				
+				<strong>World:</strong>{{> req.html}}
+				<select name="world">
+					{{#worlds}}
+						<option value="{{value}}" {{#selected}}selected{{/selected}}>{{display_text}}</option>
+					{{/worlds}}
+				</select>
+			</div>
+			
+			<div style="padding-top:10px">
+				<strong>Date range:</strong><br />
+				&nbsp;&nbsp;&nbsp;<em>timezone:</em> <code>GMT{{gmt_offset}}</code><br />
+				&nbsp;&nbsp;&nbsp;<em>data available from approx.</em> <code>{{data_start_date}}</code> <em>to present</em><br />
+				Start:{{> req.html}} <input type="text" name="startTime" id="startTime" value="{{startTime}}" onblur="checkTime(this)" />
+				End:{{> req.html}} <input type="text" name="endTime" id="endTime" value="{{endTime}}" onblur="checkTime(this)" />
+			</div>
+			<div style="padding-top:10px">
+				<strong>Bounded area coords:</strong> <em>(the two opposite corners of the rectangle)</em><br />
+				X1: <input type="text" name="x1" id="x1" size="10" value="{{x1}}" onblur="checkCoord(this)" /> Z1: <input type="text" name="z1" id="z1" size="10" value="{{z1}}" onblur="checkCoord(this)" /><br />
+				X2: <input type="text" name="x2" id="x2" size="10" value="{{x2}}" onblur="checkCoord(this)" /> Z2: <input type="text" name="z2" id="z2" size="10" value="{{z2}}" onblur="checkCoord(this)" />
+			</div>
+			<div style="padding-top:10px">
+				<strong>Players:</strong> <input type="text" name="players" id="players" value="{{players}}" /> <em>(comma separated, can be partial names)</em>
+			</div>
+			<div style="padding-top:10px">
+				<input type="checkbox" id="minimap" name="minimap" {{#minimap}}checked="checked"{{/minimap}} /> <label for="minimap">generate waypoints for Rei's Minimap</label>
+			</div>
+			
+			<table><tr>
+				<td>
+					<input id="submit" type="submit" value="Search" />
+				</td>
+				<td>
+					<span id="loading" style="display:none; font-style:italic; font-size:0.8em">
+						<img src="/images/loading.gif" /> Please wait.  Queries can take up to 30 seconds.
+					</span>
+				</td>
+			</tr></table>
+		</form>
+		{{#has_readings}}
+			<h1>Results</h1>
+			{{^readings_length}}
+				No results
+			{{/readings_length}}
+			{{#readings_length}}
+				{{#minimap_data}}
+					<div style="width:600px; background-color:#333">
+						<div>
+							<a href="#" onclick="toggleVisibility('minimapData'); return false;"><img id="minimapData-icon" src="/images/collapse.gif" /> Rei's Minimap</a>
+						</div>
+						<div id="minimapData" style="padding-left:20px">
+							<div>
+								<a href="#" onclick="toggleVisibility('minimapData-instructions'); return false;"><img id="minimapData-instructions-icon" src="/images/expand.gif" /> Instructions</a>
+								<div id="minimapData-instructions" style="display:none">
+									<ol>
+										<li>Download and install <a href="http://www.minecraftforum.net/topic/482147-142132125-oct25-reis-minimap-v32-05/" target="_blank">Rei's Minimap</a>.</li>
+										<li>
+											Open your Minecraft installation directory.
+											<ul>
+												<li>Windows: Go to "<code>Start &gt; Run</code>", type "<code>%appdata%</code>", and open the "<code>minecraft</code>" folder.</li>
+												<li>Mac: <code>/Users/yourusername/Library/Application Support/minecraft</code></li>
+												<li>Linux: <code>/home/yourusername/.minecraft</code></li>
+											</ul>
+										</li>
+										<li>Open the "<code>mods</code>" folder, then the "<code>rei_minimap</code>" folder.</li>
+										<li>Create a file and name it "<code>{{filename}}</code>".</li>
+										<li>Copy and paste the text below into the file and save it.</li>
+									</ol>
+								</div>
+							</div>
+							<div>
+								Filename: <code>{{filename}}</code><br />
+								<textarea onclick="selectAll(this)" style="width:95%; height:200px;">{{text}}</textarea>
+							</div>
+						</div>
+					</div>
+				{{/minimap_data}}
+				<div>
+					<table cellpadding="5" class="sortable" id="resultsTable">
+						<tr>
+							<th style="cursor:pointer;">Time (GMT{{gmt_offset}})</th>
+							<th style="cursor:pointer;">Player</th>
+							<th class="sorttable_nosort">(X,Z) [Y]</th>
+						</tr>
+			{{/readings_length}}
+		{{/has_readings}}
+

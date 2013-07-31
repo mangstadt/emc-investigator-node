@@ -1,0 +1,20 @@
+		{{#has_readings}}
+			{{#readings_length}}
+					</table>
+				</div>
+			
+				<script>
+				var table = document.getElementById('resultsTable');
+				table.afterSort = function(){
+					for (var i = 1; i < table.rows.length; i++){
+						var row = table.rows[i];
+						row.className = (i % 2 == 0) ? 'evenRow' : 'oddRow';
+					}
+				};
+				</script>
+			{{/readings_length}}
+		{{/has_readings}}
+		<div class="copyright">Copyright (c) 2013 Michael Angstadt</div>
+	</body>
+</html>
+

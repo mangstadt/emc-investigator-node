@@ -1,0 +1,24 @@
+{{#gap_start}}
+	<tr style="background-color: #300">
+		<td style="text-align:center">
+			{{gap_start}}<br />
+			<em>to</em><br />
+			{{gap_end}}
+		</td>
+		<td style="text-align:center" colspan="2">
+			<em>No data</em>
+		</td>
+	</tr>
+{{/gap_start}}
+{{#players}}
+	{{#odd}}
+		<tr class="oddRow">
+	{{/odd}}
+	{{^odd}}
+		<tr class="evenRow">
+	{{/odd}}
+	<td>{{ts}}</td>
+	<td><img onerror="this.style.display='none'" src="{{portrait_url}}" />{{name}}</td>
+	<td>({{x}}, {{z}}) [{{y}}]</td>
+	</tr>
+{{/players}}
