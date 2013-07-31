@@ -95,8 +95,8 @@ db.init(function(err){
 
 /**
  * Handles a GET request.
- * @param object req the HTTP request
- * @param object res the HTTP response
+ * @param {object} req the HTTP request
+ * @param {object} res the HTTP response
  */
 function on_get_request(req, res){
 	if (Object.keys(req.query).length == 0){
@@ -251,8 +251,8 @@ function on_get_request(req, res){
 
 /**
  * Sanitizes a query string parameter.
- * @param str string the string to sanitize
- * @return the sanitized string
+ * @param {string} value the string to sanitize
+ * @return {string} the sanitized string
  */
 function s(value){
 	return (value === null || typeof value === "undefined") ? "" : value.trim();
@@ -260,8 +260,8 @@ function s(value){
 
 /**
  * Sends a 404 response
- * @param object req the HTTP request
- * @param object res the HTTP response
+ * @param {object} req the HTTP request
+ * @param {object} res the HTTP response
  */
 function send_404(req, res){
 	res.writeHead(404, {"Content-type": "text/plain"});
@@ -270,8 +270,8 @@ function send_404(req, res){
 
 /**
  * Sends a 200 response.
- * @param object res the HTTP response
- * @param object data the template data
+ * @param {object} res the HTTP response
+ * @param {object} data the template data
  */
 function send_response(res, data){
 	res.setMaxListeners(700);
@@ -298,8 +298,8 @@ function send_response(res, data){
 
 /**
  * Sends a 500 response.
- * @param object res the HTTP response
- * @param object err the error
+ * @param {object} res the HTTP response
+ * @param {object} err the error
  */
 function send_error(res, err){
 	res.writeHead(500, {"Content-type": "text/plain"});
@@ -308,10 +308,11 @@ function send_error(res, err){
 
 /**
  * Builds an object for populating the template.
- * @param string [selectedServer] the server that the user selected
- * @param string [selectedWorld] the world that the user selected
- * @param object [qs] the request's query string
- * @param array(string) [errors] the form validation errors
+ * @param {string} [selectedServer] the server that the user selected
+ * @param {string} [selectedWorld] the world that the user selected
+ * @param {object} [qs] the request's query string
+ * @param {array(string)} [errors] the form validation errors
+ * @return {object} the data object
  */
 function build_data(selectedServer, selectedWorld, qs, errors){
 	var data = {
@@ -383,9 +384,9 @@ function build_data(selectedServer, selectedWorld, qs, errors){
 
 /**
  * Called when a map reading is downloaded.
- * @param object err error object
- * @param string server the server that the reading comes from (e.g. "smp1")
- * @param object reading the map reading that was downloaded
+ * @param {object} err error object
+ * @param {string} server the server that the reading comes from (e.g. "smp1")
+ * @param {object} reading the map reading that was downloaded
  */
 function on_reading_downloaded(err, server, reading){
 	if (err){

@@ -11,8 +11,8 @@ exports.readings = null;
 
 /**
  * Opens a connection with the database.
- * @param callback function(err)
- * --@param err the error object
+ * @param {function} callback(err)
+ * --@param {err} the error object
  */
 exports.init = function(callback){
 	async.waterfall([
@@ -41,10 +41,10 @@ exports.init = function(callback){
 
 /**
  * Inserts a map reading into the database.
- * @param string server the server that the reading is from (e.g. "smp1")
- * @param object reading the map reading
- * @param callback function(err)
- * --@param err the error object
+ * @param {string} server the server that the reading is from (e.g. "smp1")
+ * @param {object} reading the map reading
+ * @param {function} callback(err)
+ * --@param {err} the error object
  */
 exports.insert_reading = function(server, reading, callback){
 	reading.server = server;
@@ -53,20 +53,20 @@ exports.insert_reading = function(server, reading, callback){
 
 /**
  * Retrieves map readings from the database.
- * @param string server the server (e.g. "smp1")
- * @param string world the world (e.g. "wilderness")
- * @param number startTime the start timestamp
- * @param number endTime the end timestamp
- * @param object options
- * --@param gap_interval if a gap in the server data of this length (in milliseconds, 3 minutes by default) is found, then a "gap" result will be returned in the results to show that no data exists for this time span
- * --@param number x1 the x-coord of one of the corners of the bounded area
- * --@param number z1 the z-coord of one of the corners of the bounded area
- * --@param number x2 the x-coord of the opposite corner of the bounded area
- * --@param number z2 the z-coord of the opposite corner of the bounded area
- * --@param array(string) players the players to search for
- * @param callback function(err, reading)
- * --@param object err the error object
- * --@param object reading the next reading (or gap) that was read or null if there are no more readings
+ * @param {string} server the server (e.g. "smp1")
+ * @param {string} world the world (e.g. "wilderness")
+ * @param {number} startTime the start timestamp
+ * @param {number} endTime the end timestamp
+ * @param {object} options
+ * --@param {number} gap_interval if a gap in the server data of this length (in milliseconds, 3 minutes by default) is found, then a "gap" result will be returned in the results to show that no data exists for this time span
+ * --@param {number} x1 the x-coord of one of the corners of the bounded area
+ * --@param {number} z1 the z-coord of one of the corners of the bounded area
+ * --@param {number} x2 the x-coord of the opposite corner of the bounded area
+ * --@param {number} z2 the z-coord of the opposite corner of the bounded area
+ * --@param {array(string)} players the players to search for
+ * @param {function} callback(err, reading)
+ * --@param {object} err the error object
+ * --@param {object} reading the next reading (or gap) that was read or null if there are no more readings
  */
 exports.get_readings = function(server, world, startTime, endTime, options, callback){
 	world = world.toLowerCase();

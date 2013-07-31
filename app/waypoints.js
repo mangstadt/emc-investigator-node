@@ -6,6 +6,11 @@ exports.create = function(){
 	return new Waypoints();
 };
 
+/**
+ * Creates a new waypoint instance.
+ * @constructor
+ * @this {Waypoints}
+ */
 function Waypoints(){
 	this.cur_color = 0;
 	this.text = "";
@@ -17,7 +22,8 @@ Waypoints.prototype.colors = ["FF0000", "00FF00", "0000FF", "00FFFF", "FF00FF", 
 
 /**
  * Adds a waypoint to the waypoints list.
- * @param object player the player to add
+ * @this {Waypoints}
+ * @param {object} player the player to add
  */
 Waypoints.prototype.add = function(player){
 	if (this.count > 200){
@@ -52,9 +58,10 @@ Waypoints.prototype.add = function(player){
 
 /**
  * Generates the filename of a waypoint file.
- * @param string server the EMC server (e.g. "smp7")
- * @param numeric id the world ID (e.g. "0")
- * @return string the filename
+ * @this {Waypoints}
+ * @param {string} server the EMC server (e.g. "smp7")
+ * @param {number} id the world ID (e.g. "0")
+ * @return {string} the filename
  */
 Waypoints.prototype.build_filename = function(server, id){
 	return server + ".empire.us.DIM" + id + ".points";
