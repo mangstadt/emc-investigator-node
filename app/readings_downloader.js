@@ -42,11 +42,11 @@ function download_reading(server, callback){
 				delete obj.updates;
 				callback(null, server, obj);
 			} catch(e){
-				callback(e);
+				callback(e, server);
 			}
 		});
 	})
 	.on("error", function(err){
-		callback(err);
+		callback(err, server);
 	});
 };
