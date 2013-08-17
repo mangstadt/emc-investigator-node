@@ -39,7 +39,6 @@ function download_reading(server, callback){
 		.on("end", function(){
 			try{
 				obj = JSON.parse(body);
-				delete obj.updates;
 				callback(null, server, obj);
 			} catch(e){
 				callback(e, server);
@@ -49,4 +48,4 @@ function download_reading(server, callback){
 	.on("error", function(err){
 		callback(err, server);
 	});
-};
+}

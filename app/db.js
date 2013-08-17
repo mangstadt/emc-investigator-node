@@ -47,9 +47,28 @@ exports.init = function(callback){
  * --@param {err} the error object
  */
 exports.insert_reading = function(server, reading, callback){
+	//delete unneeded fields
+	sanitize_reading(reading);
+	
+	//add server
 	reading.server = server;
+	
 	exports.readings.insert(reading, {w:1, safe:true}, callback);
 };
+
+function sanitize_reading(reading){
+	delete reading.updates;
+	
+	if (Array.isArray(reading.players)){
+		reading.players.forEach(function(player){
+			delete player.sort;
+			delete player.armor;
+			delete player.account;
+			delete player.health;
+			delete player.type;
+		});
+	}
+}
 
 /**
  * Retrieves map readings from the database.
@@ -151,12 +170,7 @@ exports.get_readings = function(server, world, startTime, endTime, options, call
 			}
 			
 			if (matchedCoords && matchedPlayer){
-				players.push({
-					name: player.name,
-					x: player.x,
-					z: player.z,
-					y: player.y
-				});
+				players.push(player);
 			}
 		});
 		if (players.length > 0){
