@@ -61,7 +61,20 @@ db.init(function(err){
 
 	//start downloaders========================================================
 	console.log("Starting readings downloaders...");
-	readings_downloader.start(servers, env.readings_interval, on_reading_downloaded);
+	readings_downloader.start(servers, env.readings.download_interval, on_reading_downloaded);
+	
+	//start "delete old readings" job
+	console.log("Starting old readings remover...");
+	var remove_old_readings = function(){
+		db.remove_old_readings(env.readings.max_age, function(err){
+			if (err){
+				console.error("Error deleting old readings (max_age = " + env.readings.max_age + "):");
+				console.error(err);
+			}
+		});
+	};
+	remove_old_readings();
+	setInterval(remove_old_readings, env.readings.clear_interval);
 	
 	//compile templates========================================================
 	console.log("Compiling templates...");
@@ -86,7 +99,7 @@ db.init(function(err){
 		//start the web server=================================================
 		console.log("Starting web server...");
 		app.listen(8080);
-		console.log("Web server started.");
+		console.log("Ready.");
 	});
 	
 });
@@ -322,7 +335,7 @@ function build_data(selectedServer, selectedWorld, qs, errors){
 		//static data
 		servers: [],
 		worlds: [],
-		data_start_date: "2013-07-31",
+		data_start_date: moment(Date.now() - env.readings.max_age).format("YYYY-MM-DD HH:mm"),
 		gmt_offset: null,
 		
 		//data to be populated

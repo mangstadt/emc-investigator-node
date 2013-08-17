@@ -1,7 +1,7 @@
 {
 	"name": "emc-investigator",
 	"description": "Don't let the griefers win.",
-	"version": "0.1.0-15",
+	"version": "0.1.0-17",
 	"private": true,
 	"dependencies": {
 		"async": "0.1.x",

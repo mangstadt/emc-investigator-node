@@ -71,6 +71,17 @@ function sanitize_reading(reading){
 }
 
 /**
+ * Deletes all readings that are older than a given age.
+ * @param {number} max_age the max age a reading can be before it is deleted (in milliseconds)
+ * @param {function} callback(err)
+ * --@param {err} the error object
+ */
+exports.remove_old_readings = function(max_age, callback){
+	var age = Date.now() - max_age;
+	exports.readings.remove({timestamp: {$lte: age}}, callback);
+};
+
+/**
  * Retrieves map readings from the database.
  * @param {string} server the server (e.g. "smp1")
  * @param {string} world the world (e.g. "wilderness")

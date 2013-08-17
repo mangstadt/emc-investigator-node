@@ -10,5 +10,9 @@ module.exports = {
 	static_dir: "static/",
 	templates_dir: "templates/",
 	env: "dev",
-	readings_interval: 1000*60
+	readings: {
+		download_interval: 1000*60, //1 minute
+		clear_interval: 1000*60*60, //1 hour 
+		max_age: 1000*60*60*24*14 //2 weeks
+	}
 };
