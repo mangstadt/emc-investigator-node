@@ -78,18 +78,8 @@ db.init(function(err){
 	
 	//compile templates========================================================
 	console.log("Compiling templates...");
-	async.parallel([
-		function(cb){
-			mu.compile("index-top.html", cb);
-		},
-		function (cb){
-			mu.compile("reading.html", cb);
-		},
-		function (cb){
-			mu.compile("index-bottom.html", cb);
-		}
-	],
-	function(err, results){
+	var templates = ["index-top.html", "reading.html", "index-bottom.html"];
+	compile_templates(templates, function(err, results){
 		if (err){
 			console.error("Error compiling templates:");
 			console.error(err);
@@ -101,7 +91,6 @@ db.init(function(err){
 		app.listen(8080);
 		console.log("Ready.");
 	});
-	
 });
 
 //=============================================================================
@@ -417,3 +406,17 @@ function on_reading_downloaded(err, server, reading){
 	});
 }
 
+/**
+ * Compiles the Mustashe templates.
+ * @param {array(string)} templates the template file names
+ * @param {function} callback(err, results)
+ */
+function compile_templates(templates, callback){
+	var functions = [];
+	templates.forEach(function(template){
+		functions.push(function(cb){
+			mu.compile(template, cb);
+		});
+	});
+	async.parallel(functions, callback);
+}
