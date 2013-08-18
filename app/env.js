@@ -7,6 +7,7 @@ module.exports = {
 		port: process.env.DB_PORT ? process.env.DB_PORT : null,
 		pool_size: 5
 	},
+	stat_counter: true,
 	static_dir: "static/",
 	templates_dir: "templates/",
 	env: "dev",

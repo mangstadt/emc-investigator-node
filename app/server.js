@@ -326,6 +326,7 @@ function build_data(selectedServer, selectedWorld, qs, errors){
 		worlds: [],
 		data_start_date: moment(Date.now() - env.readings.max_age).format("YYYY-MM-DD HH:mm"),
 		gmt_offset: null,
+		stat_counter: env.stat_counter,
 		
 		//data to be populated
 		has_readings: false,
