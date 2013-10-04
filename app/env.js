@@ -14,6 +14,6 @@ module.exports = {
 	readings: {
 		download_interval: 1000*60*2, //2 minutes
 		clear_interval: 1000*60*60, //1 hour 
-		max_age: 1000*60*60*24*14 //2 weeks
+		max_age: 1000*60*60*24*7*4 //4 weeks
 	}
 };
