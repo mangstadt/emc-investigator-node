@@ -238,7 +238,7 @@ function on_get_request(req, res){
 			reading.ts = moment(reading.ts).format("YYYY-MM-DD HH:mm");
 			reading.players.forEach(function(player){
 				player.odd = (count % 2 == 1);
-				player.portrait_url = "http://" + server + ".empire.us:8880/tiles/faces/16x16/" + encodeURIComponent(player.name) + ".png";
+				player.portrait_url = "http://" + server + ".empire.us/tiles/faces/16x16/" + encodeURIComponent(player.name) + ".png";
 				
 				if (waypoints){
 					waypoints.add(player);
