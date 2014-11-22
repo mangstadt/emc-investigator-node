@@ -28,7 +28,7 @@ exports.start = function(servers, interval, callback){
  * --@param {object} reading the map reading that was downloaded
  */
 function download_reading(server, callback){
-	var url = "http://" + server + ".empire.us:8880/up/world/wilderness/" + Date.now();
+	var url = "http://" + server + ".empire.us/up/world/wilderness/" + Date.now();
 	
 	http.get(url, function(res){
 		var body = "";
